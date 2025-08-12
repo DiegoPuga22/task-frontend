@@ -3,15 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { RespuestaAutenticacion, Usuario } from '../models/user.model'; // Ajusta la ruta si es necesario
 import { tap } from 'rxjs/operators'; // Importa tap
+import { RespuestaAutenticacion, Usuario } from '../models/user.model'; // Ajusta la ruta si es necesario
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   // Cambié el puerto a 5000 y la ruta base a /auth como en tu backend
-  private apiUrl = 'http://localhost:5000/auth';
+  private apiUrl = 'https://auth-service-a2gf.onrender.com';
 
   constructor(
     private http: HttpClient,

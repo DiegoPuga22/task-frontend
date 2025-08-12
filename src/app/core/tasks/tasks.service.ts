@@ -7,8 +7,8 @@ import { RespuestaTareasDetalle, RespuestaTareasLista } from '../models/task.mod
   providedIn: 'root'
 })
 export class TaskService {
-  
-  private apiUrl = 'http://localhost:5000/task';
+
+  private apiUrl = 'https://task-service-fxwy.onrender.com';
 
   constructor(private http: HttpClient) {}
 
