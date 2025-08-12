@@ -1,0 +1,64 @@
+<app-header [headerTitle]="'Tareas'"></app-header>
+
+<p-confirmDialog></p-confirmDialog>
+
+<div class="task-create-button">
+  <p-button
+    label="Crear Nueva Tarea"
+    icon="pi pi-plus"
+    [raised]="true"
+    severity="primary"
+    (click)="navigateToCreate()"
+    class="create-task-btn"
+  ></p-button>
+</div>
+
+<div class="kanban-board">
+  <p-panel
+    *ngFor="let column of kanbanColumns; let i = index"
+    [header]="column.header"
+    class="kanban-column"
+    [style]="getColumnColor(column.status)"
+    [id]="column.status"
+    cdkDropList
+    [cdkDropListData]="column.tasks"
+    (cdkDropListDropped)="drop($event)"
+    [cdkDropListConnectedTo]="columnIds"
+  >
+    <ng-template pTemplate="header">
+      <div class="column-header">
+        <h3>{{ column.header }}</h3>
+        <span class="task-count">{{ column.tasks.length }} {{ column.tasks.length === 1 ? 'tarea' : 'tareas' }}</span>
+      </div>
+    </ng-template>
+    <div *ngFor="let task of column.tasks" cdkDrag class="kanban-card-wrapper">
+      <p-card class="kanban-card" [ngStyle]="{'background-color': getCardColor(task.status)}">
+        <h4 class="task-title">{{ task.name }}</h4>
+        <div class="task-content">
+          <p class="task-description">{{ task.description }}</p>
+          <small class="task-deadline">Creación: {{ task.created_at | date:'shortDate' }}</small>
+          <br />
+          <small class="task-deadline">Fecha límite: {{ task.dead_line | date:'shortDate' }}</small>
+        </div>
+        <div class="task-actions">
+          <p-button
+            icon="pi pi-pencil"
+            [rounded]="true"
+            severity="secondary"
+            (click)="navigateToEdit(task.id!)"
+            pTooltip="Editar tarea"
+            tooltipPosition="top"
+          ></p-button>
+          <p-button
+            icon="pi pi-trash"
+            [rounded]="true"
+            severity="danger"
+            (click)="confirmDelete(task.id)"
+            pTooltip="Eliminar tarea"
+            tooltipPosition="top"
+          ></p-button>
+        </div>
+      </p-card>
+    </div>
+  </p-panel>
+</div>

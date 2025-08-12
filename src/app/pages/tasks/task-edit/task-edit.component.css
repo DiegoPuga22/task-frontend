@@ -1,0 +1,55 @@
+.custom-dialog {
+  background: #1a1a1a !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.custom-dialog .p-dialog-header {
+  background: #2e2e2e !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid #555;
+}
+
+.custom-dialog .p-dialog-content {
+  padding: 1.5rem;
+}
+
+.custom-dialog .p-dialog-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 1rem;
+  border-top: 1px solid #555;
+  background: #2e2e2e !important;
+}
+
+.p-field {
+  margin-bottom: 1.5rem;
+}
+
+.p-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.p-inputtext,
+.p-dropdown {
+  width: 100%;
+  background: #2e2e2e !important;
+  color: #ffffff !important;
+  border: 1px solid #555 !important;
+  border-radius: 4px;
+}
+
+.p-button.p-button-primary {
+  background-color: #3a86ff !important; /* azul brillante */
+  border-color: #3a86ff !important;
+  color: white !important;
+}
+
+.p-button.p-button-primary:hover {
+  background-color: #265fbb !important;
+  border-color: #265fbb !important;
+}

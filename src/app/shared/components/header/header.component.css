@@ -1,0 +1,91 @@
+/* CONTENEDOR DEL HEADER */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #3e2a56; /* Morado oscuro */
+  color: #ffffff; /* Texto blanco */
+  border-bottom: 1px solid #5e3e7b; /* Línea divisoria morada */
+  border-radius: 8px 8px 0 0; /* Bordes redondeados arriba */
+}
+
+/* SECCIÓN IZQUIERDA DEL HEADER */
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+/* SECCIÓN DERECHA DEL HEADER */
+.header-right {
+  display: flex;
+  gap: 0.5rem; /* Espacio entre botones */
+}
+
+/* BOTONES GENERALES */
+.p-button {
+  margin-left: 0;
+  padding: 0.5rem;
+  min-width: 2.5rem;
+}
+
+/* BOTÓN MORADO CLARO (Agregar, por ejemplo) */
+.p-button-secondary {
+  background-color: #a57de7; /* Morado claro */
+  border: none;
+  color: #ffffff;
+}
+
+.p-button-secondary:hover {
+  background-color: #825ac0; /* Morado más oscuro al hover */
+}
+
+/* BOTÓN MORADO FUERTE (Cerrar sesión, peligro) */
+.p-button-danger {
+  background-color: #9c27b0; /* Morado fuerte */
+  border: none;
+  color: #ffffff;
+}
+
+.p-button-danger:hover {
+  background-color: #6a0080; /* Hover más oscuro */
+}
+
+/* BOTÓN VERDE (Visualizar tareas) */
+.p-button-success {
+  background-color: #43a047 !important; /* Verde */
+  border: none !important;
+  color: #ffffff !important;
+}
+
+.p-button-success:hover {
+  background-color: #388e3c !important; /* Verde más oscuro al hover */
+}
+
+/* BOTÓN AZUL (Agregar tarea) */
+.p-button-info {
+  background-color: #1976d2; /* Azul */
+  border: none;
+  color: #ffffff;
+}
+
+.p-button-info:hover {
+  background-color: #115293; /* Azul más oscuro al hover */
+}
+
+/* BOTÓN REDONDEADO (ajustado para que no sean circulares) */
+.p-button-rounded {
+  border-radius: 6px; /* Bordes ligeramente redondeados, no círculo */
+  min-width: 2.5rem;
+  width: auto;
+  height: auto;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ajuste para iconos dentro de los botones */
+.p-button .pi {
+  font-size: 1.2rem;
+}

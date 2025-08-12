@@ -1,0 +1,85 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a4ed6, #7ce00a); /* Modo oscuro (original) */
+  overflow: hidden;
+  position: relative;
+  transition: background 0.3s ease; /* Suaviza el cambio de tema */
+}
+
+/* Estilos para el modo claro */
+.login-container.light-mode {
+  background: linear-gradient(135deg, #f3f4f671, #ffffff); /* Gradiente claro */
+}
+
+/* Ajustar el color del texto en modo claro para mejor legibilidad */
+.login-container.light-mode .login-title {
+  color: #1e293b; /* Color oscuro para el título en modo claro */
+}
+
+/* Ajustar el fondo del p-card en modo claro para mejor contraste */
+.login-container.light-mode .p-card {
+  background-color: #ffffff; /* Fondo blanco para el card en modo claro */
+  box-shadow: 0 4px 6px rgba(238, 10, 204, 0.898); /* Sombra suave para el card */
+}
+
+.header-circle-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.user-icon-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-icon {
+  font-size: 2rem;
+  color: #4a4a4a;
+}
+
+.login-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff; /* Color original para modo oscuro */
+  margin-bottom: 1rem;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.login-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+/* Estilos para el botón de cambio de tema */
+.theme-toggle-btn {
+  margin-top: 1rem;
+  align-self: center; /* Centra el botón */
+}
+
+/* Ajustar el estilo del botón en modo claro para mantener consistencia */
+.login-container.light-mode .theme-toggle-btn .p-button {
+  background-color: #c63616; /* Fondo oscuro en modo claro */
+  color: #ffffff; /* Texto blanco */
+  border-color: #1e293b;
+}
+
+.login-container.light-mode .theme-toggle-btn .p-button:hover {
+  background-color: #e25f18; /* Más oscuro al pasar el ratón */
+  border-color: #2d3748;
+}
