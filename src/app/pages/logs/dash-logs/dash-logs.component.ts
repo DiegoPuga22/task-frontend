@@ -1,11 +1,10 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, Inject, PLATFORM_ID, OnDestroy } from '@angular/core';
+import { DecimalPipe, isPlatformBrowser } from '@angular/common';
+import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit, PLATFORM_ID, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import Chart from 'chart.js/auto';
 import { ChartModule } from 'primeng/chart';
 import { LogService } from '../../../core/logs/log.service';
-import Chart from 'chart.js/auto';
-import { isPlatformBrowser } from '@angular/common';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
-import { Router } from '@angular/router';
-import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-dash-logs',
@@ -62,9 +61,16 @@ export class DashLogsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private fetchLogs(): void {
-    this.logService.getLogs().subscribe(data => {
-      this.logData = data.logs;
-      this.processLogs();
+    this.logService.getLogs().subscribe({
+      next: (data) => {
+        // Limitar la cantidad de logs procesados para evitar que el frontend se caiga
+  this.logData = Array.isArray(data.logs) ? data.logs.slice(0, 5000000) : [];
+        this.processLogs();
+      },
+      error: (err) => {
+        this.logData = [];
+        this.processLogs();
+      }
     });
   }
 
