@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { TaskService } from '../../../core/tasks/tasks.service';
-import { Task, RespuestaTareasLista } from '../../../core/models/task.model';
-import { PanelModule } from 'primeng/panel';
-import { CardModule } from 'primeng/card';
-import { CommonModule } from '@angular/common';
-import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
 import { ConfirmationService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { PanelModule } from 'primeng/panel';
+import { RespuestaTareasLista, Task } from '../../../core/models/task.model';
+import { TaskService } from '../../../core/tasks/tasks.service';
+import { HeaderComponent } from '../../../shared/components/header/header.component';
 
 // Interfaz para tipar las columnas del Kanban
 interface KanbanColumn {
@@ -86,7 +86,7 @@ export class TaskListComponent implements OnInit {
         event.currentIndex
       );
 
-      this.taskService.updateTaskStatus(task.id!, newStatus).subscribe({
+  this.taskService.updateTaskStatus(String(task.id), newStatus).subscribe({
         next: (res) => {
           console.log('Estado de la tarea actualizado:', res);
           const taskIndex = this.tasks.findIndex((t) => t.id === task.id);
@@ -152,7 +152,7 @@ export class TaskListComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       rejectButtonStyleClass: 'p-button-secondary',
       accept: () => {
-        this.taskService.deleteTask(Number(taskId)).subscribe({
+  this.taskService.deleteTask(taskId).subscribe({
           next: () => {
             this.tasks = this.tasks.filter(t => t.id !== Number(taskId));
             this.setKanbanColumns();

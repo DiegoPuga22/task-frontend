@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TaskService } from '../../../core/tasks/tasks.service';
-import { Task, RespuestaTareasDetalle } from '../../../core/models/task.model';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { DropdownModule } from 'primeng/dropdown';
-import { ButtonModule } from 'primeng/button';
-import { MessageService } from 'primeng/api';
-import { ToastModule } from 'primeng/toast';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+import { InputTextModule } from 'primeng/inputtext';
+import { ToastModule } from 'primeng/toast';
+import { RespuestaTareasDetalle, Task } from '../../../core/models/task.model';
+import { TaskService } from '../../../core/tasks/tasks.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 
 @Component({
@@ -74,7 +74,7 @@ export class TaskEditComponent implements OnInit {
   }
 
   loadTask(): void {
-    this.taskService.getTaskById(Number(this.taskId!)).subscribe({
+    this.taskService.getTaskById(this.taskId!).subscribe({
       next: (res: RespuestaTareasDetalle) => {
         if (res.statusCode === 200 && res.intData?.data) {
           const task = res.intData.data;
@@ -134,7 +134,7 @@ export class TaskEditComponent implements OnInit {
         dead_line: formatDate(this.task.dead_line),
       };
 
-      this.taskService.updateTask(Number(this.taskId!), taskToSubmit).subscribe({
+  this.taskService.updateTask(this.taskId!, taskToSubmit).subscribe({
         next: (res) => {
           if (res.statusCode === 200) {
             this.messageService.add({

@@ -1,15 +1,17 @@
 import { DecimalPipe, isPlatformBrowser } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit, PLATFORM_ID, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import Chart from 'chart.js/auto';
 import { ChartModule } from 'primeng/chart';
 import { LogService } from '../../../core/logs/log.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
+import { LogFilterPipe } from './log-filter.pipe';
 
 @Component({
   selector: 'app-dash-logs',
   standalone: true,
-  imports: [ChartModule, HeaderComponent, DecimalPipe],
+  imports: [ChartModule, HeaderComponent, DecimalPipe, LogFilterPipe, FormsModule],
   templateUrl: './dash-logs.component.html',
   styleUrl: './dash-logs.component.css'
 })
@@ -22,6 +24,10 @@ export class DashLogsComponent implements OnInit, AfterViewInit, OnDestroy {
   maxResponseTime: number = 0;
   apiUsage: { [key: string]: number } = {};
   logsByService: { [key: string]: number } = {};
+  logUserFilter: string = '';
+  logStatusFilter: string = '';
+  logTimeFilter: number | null = null;
+  logDateFilter: string = '';
 
   @ViewChild('statusChart') statusChartRef!: ElementRef;
   @ViewChild('apiChart') apiChartRef!: ElementRef;
@@ -85,45 +91,49 @@ export class DashLogsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.maxResponseTime = -Infinity;
     this.avgResponseTime = 0;
 
-    this.logData.forEach(log => {
-      const statusMatch = log.match(/Status: (\d+)/);
-      const timeMatch = log.match(/Time: (\d*\.\d{2,4})s/);
-      const routeMatch = log.match(/Route: (\/[^ ]+)/);
-      const serviceMatch = log.match(/Service: ([^ ]+)/);
+    this.logData.forEach(logStr => {
+      // Parsear el log si es string, o usarlo directamente si ya es objeto
+      let log: any;
+      if (typeof logStr === 'string') {
+        try {
+          log = JSON.parse(logStr);
+        } catch {
+          return; // Saltar logs malformados
+        }
+      } else {
+        log = logStr;
+      }
+      const status = log.status;
+      const time = log.response_time;
+      const user = log.user;
+      const timestamp = log.timestamp;
+      // Si tienes campos como 'route' o 'service', agrégalos aquí
+      // const route = log.route;
+      // const service = log.service;
 
-      if (statusMatch) {
-        const status = statusMatch[1];
+      if (status) {
         this.statusCounts[status] = (this.statusCounts[status] || 0) + 1;
       }
-
-      if (timeMatch) {
-        const time = parseFloat(timeMatch[1]);
+      if (typeof time === 'number') {
         totalResponseTime += time;
         responseTimes.push(time);
         this.minResponseTime = Math.min(this.minResponseTime, time);
         this.maxResponseTime = Math.max(this.maxResponseTime, time);
       }
-
-      if (routeMatch && serviceMatch && routeMatch[1] && serviceMatch[1]) {
-        const logRoute: string = routeMatch[1];
-        const logService: string = serviceMatch[1];
-        const apiKey = `${logService}:${logRoute}`;
-        this.apiUsage[apiKey] = (this.apiUsage[apiKey] || 0) + 1;
-        this.logsByService[logService] = (this.logsByService[logService] || 0) + 1;
-      }
+      // Si tienes más campos para estadísticas, agrégalos aquí
     });
+
+    this.avgResponseTime = responseTimes.length ? totalResponseTime / responseTimes.length : 0;
+    if (responseTimes.length === 0) {
+      this.minResponseTime = 0;
+      this.maxResponseTime = 0;
+    }
 
     const now = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
     this.logHistory.push({ timestamp: now, total: this.totalLogs });
 
     if (this.logHistory.length > 10) {
       this.logHistory.shift();
-    }
-
-    this.avgResponseTime = responseTimes.length ? totalResponseTime / responseTimes.length : 0;
-    if (responseTimes.length === 0) {
-      this.minResponseTime = 0;
-      this.maxResponseTime = 0;
     }
 
     if (isPlatformBrowser(this.platformId)) {
@@ -275,5 +285,12 @@ export class DashLogsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   goBack(): void {
     this.router.navigate(['/tasks/task-list']);
+  }
+
+  clearLogFilters() {
+    this.logUserFilter = '';
+    this.logStatusFilter = '';
+    this.logTimeFilter = null;
+    this.logDateFilter = '';
   }
 }

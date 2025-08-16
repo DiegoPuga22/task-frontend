@@ -49,6 +49,49 @@
         <canvas #totalLogsChart></canvas>
       </div>
     </div>
+
+    <div class="logs-table-section" *ngIf="totalLogs > 0">
+      <h4 style="margin-top:2rem; color:#1976d2;">Detalle de Logs Recientes</h4>
+      <div class="logs-filters" style="margin-bottom:1rem; display:flex; gap:1.5rem; align-items:center; flex-wrap:wrap;">
+        <label>
+          Usuario:
+          <input type="text" [(ngModel)]="logUserFilter" placeholder="Filtrar por usuario" style="padding:0.3rem 0.7rem; border-radius:6px; border:1px solid #ccc;" />
+        </label>
+        <label>
+          Status:
+          <input type="text" [(ngModel)]="logStatusFilter" placeholder="Filtrar por status" style="padding:0.3rem 0.7rem; border-radius:6px; border:1px solid #ccc;" />
+        </label>
+        <label>
+          Tiempo de respuesta (s):
+          <input type="number" [(ngModel)]="logTimeFilter" placeholder="Ej: 0.5" style="padding:0.3rem 0.7rem; border-radius:6px; border:1px solid #ccc; width:90px;" />
+        </label>
+        <label>
+          Fecha:
+          <input type="date" [(ngModel)]="logDateFilter" style="padding:0.3rem 0.7rem; border-radius:6px; border:1px solid #ccc;" />
+        </label>
+        <button pButton pRipple type="button" icon="pi pi-filter-slash" (click)="clearLogFilters()" class="p-button-secondary p-button-sm">Limpiar filtros</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="logs-table">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Status</th>
+              <th>Tiempo de Respuesta</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let log of logData | logFilter:logUserFilter:logStatusFilter:logTimeFilter:logDateFilter">
+              <td>{{ log.user || '-' }}</td>
+              <td>{{ log.status || '-' }}</td>
+              <td>{{ log.response_time !== undefined ? (log.response_time + 's') : '-' }}</td>
+              <td>{{ log.timestamp || '-' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -124,6 +167,30 @@
   margin: 3rem 0 2rem 0;
   color: #888;
   font-size: 1.2rem;
+}
+.logs-table-section {
+  margin-top: 2rem;
+}
+.logs-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px 0 rgba(25,118,210,0.04);
+  font-size: 1rem;
+}
+.logs-table th, .logs-table td {
+  padding: 0.7rem 1.2rem;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: left;
+}
+.logs-table th {
+  background: #1976d2;
+  color: #fff;
+  font-weight: 600;
+}
+.logs-table tr:last-child td {
+  border-bottom: none;
 }
 @media (max-width: 900px) {
   .stats-summary-pro {

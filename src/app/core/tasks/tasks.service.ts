@@ -12,7 +12,7 @@ export class TaskService {
 
   constructor(private http: HttpClient) {}
 
-  getTaskById(taskId: number): Observable<RespuestaTareasDetalle> {
+  getTaskById(taskId: string): Observable<RespuestaTareasDetalle> {
     return this.http.get<RespuestaTareasDetalle>(`${this.apiUrl}/tasks/${taskId}`);
   }
 
@@ -22,7 +22,7 @@ export class TaskService {
   }
 
   // Actualizar estado de tarea
-  updateTaskStatus(taskId: number, status: string): Observable<any> {
+  updateTaskStatus(taskId: string, status: string): Observable<any> {
     return this.http.put(`${this.apiUrl}/update_task_status/${taskId}`, { status });
   }
 
@@ -32,12 +32,12 @@ export class TaskService {
   }
 
   // Actualizar tarea completa
-  updateTask(taskId: number, taskData: any): Observable<any> {
+  updateTask(taskId: string, taskData: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/update_task/${taskId}`, taskData);
   }
 
   // Eliminar tarea
-  deleteTask(taskId: number): Observable<any> {
+  deleteTask(taskId: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/delete_task/${taskId}`);
   }
 }
