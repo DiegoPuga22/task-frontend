@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
+import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { AuthService } from '../../../core/auth/auth.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -24,10 +24,6 @@ export class HeaderComponent {
     console.log('Se hizo clic en Cerrar sesión');
   }
 
-  addTask() {
-    console.log('Add task clicked');
-    this.router.navigate(['/tasks/task-create']);
-  }
   getTasksByUser(): void {
   console.log('getTasksByUser called');
     this.router.navigate(['/tasks/task-list'], { queryParams: { refresh: 'true' } });

@@ -1,16 +1,17 @@
-import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { ConfirmationService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { PanelModule } from 'primeng/panel';
-import { RespuestaTareasLista, Task } from '../../../core/models/task.model';
 import { TaskService } from '../../../core/tasks/tasks.service';
+import { Task, RespuestaTareasLista } from '../../../core/models/task.model';
+import { PanelModule } from 'primeng/panel';
+import { CardModule } from 'primeng/card';
+import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
+import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { Router } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
+// Interfaz para tipar las columnas del Kanban
 interface KanbanColumn {
   header: string;
   status: string;
@@ -22,15 +23,7 @@ interface KanbanColumn {
   standalone: true,
   templateUrl: './task-list.component.html',
   styleUrls: ['./task-list.component.css'],
-  imports: [
-    CommonModule,
-    PanelModule,
-    CardModule,
-    HeaderComponent,
-    DragDropModule,
-    ButtonModule,
-    ConfirmDialogModule
-  ],
+  imports: [CommonModule, PanelModule, CardModule, HeaderComponent, DragDropModule, ButtonModule, ConfirmDialogModule],
   providers: [ConfirmationService]
 })
 export class TaskListComponent implements OnInit {
@@ -38,30 +31,26 @@ export class TaskListComponent implements OnInit {
   kanbanColumns: KanbanColumn[] = [];
   columnIds: string[] = [];
 
-  constructor(
-    private taskService: TaskService,
-    private router: Router,
-    private confirmationService: ConfirmationService
-  ) {}
+  constructor(private taskService: TaskService, private router: Router, private confirmationService: ConfirmationService) {}
 
   ngOnInit(): void {
     let username: string | null = null;
-
     if (typeof window !== 'undefined') {
       username = localStorage.getItem('username');
     }
-
     if (username) {
       this.taskService.getTasksByUser(username).subscribe({
         next: (res: RespuestaTareasLista) => {
           this.tasks = res.intData?.data ?? [];
           this.setKanbanColumns();
         },
-        error: (err: unknown) => {
+        error: (err) => {
           this.tasks = [];
           console.error('Error fetching tasks:', err);
         },
       });
+    } else {
+      console.error('No username found in localStorage');
     }
   }
 
@@ -69,29 +58,27 @@ export class TaskListComponent implements OnInit {
     this.router.navigate(['/tasks/task-create']);
   }
 
-  navigateToEdit(taskId: number): void {
-    console.log('Navegando a editar tarea con ID:', taskId);
+  navigateToEdit(taskId: string): void {
     this.router.navigate([`/tasks/task-edit/${taskId}`]);
   }
 
-  setKanbanColumns(): void {
+  setKanbanColumns() {
     this.kanbanColumns = [
-      { header: 'Pendiente', status: 'Incomplete', tasks: this.tasks.filter(t => t.status === 'Incomplete') },
-      { header: 'En progreso', status: 'InProgress', tasks: this.tasks.filter(t => t.status === 'InProgress') },
-      { header: 'Pausada', status: 'Paused', tasks: this.tasks.filter(t => t.status === 'Paused') },
-      { header: 'Revisión', status: 'Revision', tasks: this.tasks.filter(t => t.status === 'Revision') },
-      { header: 'Hecho', status: 'Completed', tasks: this.tasks.filter(t => t.status === 'Completed') },
+      { header: 'Pendiente', status: 'Incomplete', tasks: this.tasks.filter((t) => t.status === 'Incomplete') },
+      { header: 'En progreso', status: 'InProgress', tasks: this.tasks.filter((t) => t.status === 'InProgress') },
+      { header: 'Pausada', status: 'Paused', tasks: this.tasks.filter((t) => t.status === 'Paused') },
+      { header: 'Revisión', status: 'Revision', tasks: this.tasks.filter((t) => t.status === 'Revision') },
+      { header: 'Hecho', status: 'Completed', tasks: this.tasks.filter((t) => t.status === 'Completed') },
     ];
-    this.columnIds = this.kanbanColumns.map(column => column.status);
+    this.columnIds = this.kanbanColumns.map((column) => column.status);
   }
 
-  drop(event: CdkDragDrop<Task[]>): void {
+  drop(event: CdkDragDrop<Task[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
       const task = event.previousContainer.data[event.previousIndex];
       const newStatus = event.container.id;
-
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
@@ -100,14 +87,14 @@ export class TaskListComponent implements OnInit {
       );
 
       this.taskService.updateTaskStatus(task.id!, newStatus).subscribe({
-        next: (res: any) => {
+        next: (res) => {
           console.log('Estado de la tarea actualizado:', res);
-          const taskIndex = this.tasks.findIndex(t => t.id === task.id);
+          const taskIndex = this.tasks.findIndex((t) => t.id === task.id);
           if (taskIndex !== -1) {
             this.tasks[taskIndex].status = newStatus;
           }
         },
-        error: (err: unknown) => {
+        error: (err) => {
           console.error('Error al actualizar el estado de la tarea:', err);
           transferArrayItem(
             event.container.data,
@@ -122,27 +109,38 @@ export class TaskListComponent implements OnInit {
 
   getCardColor(status: string): string {
     switch (status.toLowerCase()) {
-      case 'completed': return '#d1fae5';
-      case 'paused': return '#fef9c3';
-      case 'inprogress': return '#fed7aa';
-      case 'revision': return '#bfdbfe';
+      case 'completed':
+        return '#A5D6A7';
+      case 'paused':
+        return '#FFF59D';
+      case 'inprogress':
+        return '#FFCC80';
+      case 'revision':
+        return '#90CAF9';
       case 'incomplete':
-      default: return '#f1f5f9';
+      default:
+        return '#ECEFF1';
     }
   }
 
   getColumnColor(status: string): { 'background-color': string } {
     switch (status.toLowerCase()) {
-      case 'incomplete': return { 'background-color': '#334155' };
-      case 'inprogress': return { 'background-color': '#f59e0b' };
-      case 'paused': return { 'background-color': '#eab308' };
-      case 'revision': return { 'background-color': '#3b82f6' };
-      case 'completed': return { 'background-color': '#10b981' };
-      default: return { 'background-color': '#6b7280' };
+      case 'incomplete':
+        return { 'background-color': '#546E7A' };
+      case 'inprogress':
+        return { 'background-color': '#FB8C00' };
+      case 'paused':
+        return { 'background-color': '#FBC02D' };
+      case 'revision':
+        return { 'background-color': '#1E88E5' };
+      case 'completed':
+        return { 'background-color': '#66BB6A' };
+      default:
+        return { 'background-color': '#757575' };
     }
   }
 
-  confirmDelete(taskId?: number): void {
+  confirmDelete(taskId?: string) {
     if (!taskId) return;
 
     this.confirmationService.confirm({
@@ -154,12 +152,12 @@ export class TaskListComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       rejectButtonStyleClass: 'p-button-secondary',
       accept: () => {
-        this.taskService.deleteTask(taskId).subscribe({
+        this.taskService.deleteTask(Number(taskId)).subscribe({
           next: () => {
-            this.tasks = this.tasks.filter(t => t.id !== taskId);
+            this.tasks = this.tasks.filter(t => t.id !== Number(taskId));
             this.setKanbanColumns();
           },
-          error: (err: unknown) => {
+          error: (err) => {
             console.error('Error al eliminar la tarea:', err);
           }
         });

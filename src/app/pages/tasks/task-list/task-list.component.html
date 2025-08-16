@@ -45,7 +45,7 @@
             icon="pi pi-pencil"
             [rounded]="true"
             severity="secondary"
-            (click)="navigateToEdit(task.id!)"
+            (click)="navigateToEdit(task.id!.toString())"
             pTooltip="Editar tarea"
             tooltipPosition="top"
           ></p-button>
@@ -53,7 +53,7 @@
             icon="pi pi-trash"
             [rounded]="true"
             severity="danger"
-            (click)="confirmDelete(task.id)"
+            (click)="confirmDelete(task.id?.toString())"
             pTooltip="Eliminar tarea"
             tooltipPosition="top"
           ></p-button>

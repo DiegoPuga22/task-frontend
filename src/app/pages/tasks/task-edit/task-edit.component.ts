@@ -1,17 +1,17 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
+import { TaskService } from '../../../core/tasks/tasks.service';
+import { Task, RespuestaTareasDetalle } from '../../../core/models/task.model';
+import { CommonModule } from '@angular/common';
+import { FormsModule, NgForm } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
 import { CalendarModule } from 'primeng/calendar';
 import { DropdownModule } from 'primeng/dropdown';
+import { ButtonModule } from 'primeng/button';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-import { InputTextModule } from 'primeng/inputtext';
-import { ToastModule } from 'primeng/toast';
-import { RespuestaTareasDetalle, Task } from '../../../core/models/task.model';
-import { TaskService } from '../../../core/tasks/tasks.service';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 
 @Component({
@@ -37,13 +37,12 @@ export class TaskEditComponent implements OnInit {
   task: Task = {
     name: '',
     description: '',
-    created_at: new Date(),
-    dead_line: new Date(),
+    created_at: '',
+    dead_line: '',
     status: 'Incomplete',
     is_alive: true,
     created_by: '',
   };
-
   validStatuses = [
     { label: 'Pendiente', value: 'Incomplete' },
     { label: 'En progreso', value: 'InProgress' },
@@ -51,8 +50,7 @@ export class TaskEditComponent implements OnInit {
     { label: 'Revisión', value: 'Revision' },
     { label: 'Completada', value: 'Completed' },
   ];
-
-  taskId: number | null = null;
+  taskId: string | null = null;
 
   constructor(
     private taskService: TaskService,
@@ -62,7 +60,7 @@ export class TaskEditComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.taskId = Number(this.route.snapshot.paramMap.get('id'));
+    this.taskId = this.route.snapshot.paramMap.get('taskId');
     if (this.taskId) {
       this.loadTask();
     } else {
@@ -76,19 +74,18 @@ export class TaskEditComponent implements OnInit {
   }
 
   loadTask(): void {
-    this.taskService.getTaskById(this.taskId!).subscribe({
+    this.taskService.getTaskById(Number(this.taskId!)).subscribe({
       next: (res: RespuestaTareasDetalle) => {
         if (res.statusCode === 200 && res.intData?.data) {
           const task = res.intData.data;
           this.task = {
             name: task.name,
             description: task.description,
-            created_at: new Date(task.created_at), // Convertir string a Date para p-calendar
-            dead_line: new Date(task.dead_line), // Convertir string a Date para p-calendar
+            created_at: task.created_at, // String en formato YYYY-MM-DD
+            dead_line: task.dead_line,  // String en formato YYYY-MM-DD
             status: task.status,
             is_alive: task.is_alive,
             created_by: task.created_by,
-            id: task.id, // Incluir id si está presente
           };
         } else {
           this.messageService.add({
@@ -99,8 +96,7 @@ export class TaskEditComponent implements OnInit {
           this.router.navigate(['/tasks/task-list']);
         }
       },
-      error: (err: unknown) => {
-        console.error('Error al cargar tarea:', err);
+      error: (err) => {
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
@@ -128,7 +124,7 @@ export class TaskEditComponent implements OnInit {
         }
         return date;
       }
-      return date.toISOString().split('T')[0]; // Convertir Date a YYYY-MM-DD
+      return date.toISOString().split('T')[0];
     };
 
     try {
@@ -138,8 +134,8 @@ export class TaskEditComponent implements OnInit {
         dead_line: formatDate(this.task.dead_line),
       };
 
-      this.taskService.updateTask(this.taskId!, taskToSubmit).subscribe({
-        next: (res: any) => {
+      this.taskService.updateTask(Number(this.taskId!), taskToSubmit).subscribe({
+        next: (res) => {
           if (res.statusCode === 200) {
             this.messageService.add({
               severity: 'success',
@@ -155,8 +151,7 @@ export class TaskEditComponent implements OnInit {
             });
           }
         },
-        error: (err: unknown) => {
-          console.error('Error al actualizar tarea:', err);
+        error: (err) => {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
