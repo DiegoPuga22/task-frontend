@@ -11,7 +11,7 @@ import { RespuestaAutenticacion, Usuario } from '../models/user.model'; // Ajust
 })
 export class AuthService {
   // Cambié el puerto a 5000 y la ruta base a /auth como en tu backend
-  private apiUrl = 'https://auth-service-a2gf.onrender.com';
+  private apiUrl = 'https://auth-services-3g2d.onrender.com';
 
   constructor(
     private http: HttpClient,

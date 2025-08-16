@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class LogService {
-  private apiUrl = 'http://localhost:5000/logs'; // Ajusta la URL según tu backend
+  private apiUrl = 'https://api-gateway-345o.onrender.com'; // Ajusta la URL según tu backend
 
   constructor(private http: HttpClient) {}
 
