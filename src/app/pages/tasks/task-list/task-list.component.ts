@@ -152,10 +152,26 @@ export class TaskListComponent implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       rejectButtonStyleClass: 'p-button-secondary',
       accept: () => {
-  this.taskService.deleteTask(taskId).subscribe({
+        this.taskService.deleteTask(taskId).subscribe({
           next: () => {
-            this.tasks = this.tasks.filter(t => t.id !== Number(taskId));
-            this.setKanbanColumns();
+            // Refresca la lista de tareas tras eliminar
+            let username: string | null = null;
+            if (typeof window !== 'undefined') {
+              username = localStorage.getItem('username');
+            }
+            if (username) {
+              this.taskService.getTasksByUser(username).subscribe({
+                next: (res: RespuestaTareasLista) => {
+                  this.tasks = res.intData?.data ?? [];
+                  this.setKanbanColumns();
+                },
+                error: (err) => {
+                  this.tasks = [];
+                  this.setKanbanColumns();
+                  console.error('Error fetching tasks:', err);
+                },
+              });
+            }
           },
           error: (err) => {
             console.error('Error al eliminar la tarea:', err);

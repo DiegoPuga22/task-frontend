@@ -1,6 +1,6 @@
 import { DecimalPipe, isPlatformBrowser } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit, PLATFORM_ID, ViewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import Chart from 'chart.js/auto';
 import { ChartModule } from 'primeng/chart';
@@ -69,8 +69,9 @@ export class DashLogsComponent implements OnInit, AfterViewInit, OnDestroy {
   private fetchLogs(): void {
     this.logService.getLogs().subscribe({
       next: (data) => {
+        console.log('Respuesta de logs:', data);
         // Limitar la cantidad de logs procesados para evitar que el frontend se caiga
-  this.logData = Array.isArray(data.logs) ? data.logs.slice(0, 5000000) : [];
+        this.logData = Array.isArray(data.logs) ? data.logs.slice(0, 5000000) : [];
         this.processLogs();
       },
       error: (err) => {
@@ -160,6 +161,9 @@ export class DashLogsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   initializeCharts(): void {
+    if (!this.statusChartRef || !this.apiChartRef || !this.responseTimeChartRef || !this.totalLogsChartRef) {
+      return;
+    }
     const statusCtx = this.statusChartRef.nativeElement.getContext('2d');
     this.statusChart = new Chart(statusCtx, {
       type: 'pie',
