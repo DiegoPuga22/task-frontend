@@ -1,15 +1,15 @@
-import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { ConfirmationService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { PanelModule } from 'primeng/panel';
-import { RespuestaTareasLista, Task } from '../../../core/models/task.model';
 import { TaskService } from '../../../core/tasks/tasks.service';
+import { Task, RespuestaTareasLista } from '../../../core/models/task.model';
+import { PanelModule } from 'primeng/panel';
+import { CardModule } from 'primeng/card';
+import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
+import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { Router } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 // Interfaz para tipar las columnas del Kanban
 interface KanbanColumn {
@@ -30,6 +30,7 @@ export class TaskListComponent implements OnInit {
   tasks: Task[] = [];
   kanbanColumns: KanbanColumn[] = [];
   columnIds: string[] = [];
+  rateLimitMessage: string | null = null;
 
   constructor(private taskService: TaskService, private router: Router, private confirmationService: ConfirmationService) {}
 
@@ -43,14 +44,21 @@ export class TaskListComponent implements OnInit {
         next: (res: RespuestaTareasLista) => {
           this.tasks = res.intData?.data ?? [];
           this.setKanbanColumns();
+          this.rateLimitMessage = null;
         },
         error: (err) => {
           this.tasks = [];
+          if (err.status === 429) {
+            this.rateLimitMessage = err.error.intData?.message || 'Has alcanzado el límite de peticiones. Por favor, intenta de nuevo más tarde.';
+          } else {
+            this.rateLimitMessage = 'Ocurrió un error al cargar las tareas. Por favor, intenta de nuevo.';
+          }
           console.error('Error fetching tasks:', err);
         },
       });
     } else {
       console.error('No username found in localStorage');
+      this.rateLimitMessage = 'No se encontró el nombre de usuario. Por favor, inicia sesión nuevamente.';
     }
   }
 
@@ -86,13 +94,14 @@ export class TaskListComponent implements OnInit {
         event.currentIndex
       );
 
-  this.taskService.updateTaskStatus(String(task.id), newStatus).subscribe({
+      this.taskService.updateTaskStatus(task.id!, newStatus).subscribe({
         next: (res) => {
           console.log('Estado de la tarea actualizado:', res);
           const taskIndex = this.tasks.findIndex((t) => t.id === task.id);
           if (taskIndex !== -1) {
             this.tasks[taskIndex].status = newStatus;
           }
+          this.rateLimitMessage = null;
         },
         error: (err) => {
           console.error('Error al actualizar el estado de la tarea:', err);
@@ -102,6 +111,11 @@ export class TaskListComponent implements OnInit {
             event.currentIndex,
             event.previousIndex
           );
+          if (err.status === 429) {
+            this.rateLimitMessage = err.error.intData?.message || 'Has alcanzado el límite de peticiones. Por favor, intenta de nuevo más tarde.';
+          } else {
+            this.rateLimitMessage = 'Ocurrió un error al actualizar el estado de la tarea. Por favor, intenta de nuevo.';
+          }
         },
       });
     }
@@ -154,30 +168,24 @@ export class TaskListComponent implements OnInit {
       accept: () => {
         this.taskService.deleteTask(taskId).subscribe({
           next: () => {
-            // Refresca la lista de tareas tras eliminar
-            let username: string | null = null;
-            if (typeof window !== 'undefined') {
-              username = localStorage.getItem('username');
-            }
-            if (username) {
-              this.taskService.getTasksByUser(username).subscribe({
-                next: (res: RespuestaTareasLista) => {
-                  this.tasks = res.intData?.data ?? [];
-                  this.setKanbanColumns();
-                },
-                error: (err) => {
-                  this.tasks = [];
-                  this.setKanbanColumns();
-                  console.error('Error fetching tasks:', err);
-                },
-              });
-            }
+            this.tasks = this.tasks.filter(t => t.id !== taskId);
+            this.setKanbanColumns();
+            this.rateLimitMessage = null;
           },
           error: (err) => {
             console.error('Error al eliminar la tarea:', err);
+            if (err.status === 429) {
+              this.rateLimitMessage = err.error.intData?.message || 'Has alcanzado el límite de peticiones. Por favor, intenta de nuevo más tarde.';
+            } else {
+              this.rateLimitMessage = 'Ocurrió un error al eliminar la tarea. Por favor, intenta de nuevo.';
+            }
           }
         });
       }
     });
+  }
+
+  clearRateLimitMessage() {
+    this.rateLimitMessage = null;
   }
 }

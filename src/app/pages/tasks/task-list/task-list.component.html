@@ -5,6 +5,11 @@
 
 <p-confirmDialog></p-confirmDialog>
 
+<div *ngIf="rateLimitMessage" class="alert alert-warning">
+  {{ rateLimitMessage }}
+  <button class="close-btn" (click)="clearRateLimitMessage()">×</button>
+</div>
+
 <div class="task-create-button">
   <p-button
     label="Crear Nueva Tarea"
@@ -48,7 +53,7 @@
             icon="pi pi-pencil"
             [rounded]="true"
             severity="secondary"
-            (click)="navigateToEdit(task.id!.toString())"
+            (click)="navigateToEdit(task.id!)"
             pTooltip="Editar tarea"
             tooltipPosition="top"
           ></p-button>
@@ -56,7 +61,7 @@
             icon="pi pi-trash"
             [rounded]="true"
             severity="danger"
-            (click)="confirmDelete(task.id?.toString())"
+            (click)="confirmDelete(task.id)"
             pTooltip="Eliminar tarea"
             tooltipPosition="top"
           ></p-button>
