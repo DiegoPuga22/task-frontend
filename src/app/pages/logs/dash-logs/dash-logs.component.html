@@ -1,204 +1,97 @@
-<app-header [headerTitle]="'Dashboard de Logs'"></app-header>
+<!-- dashlogs.component.html -->
+<app-header></app-header>
+<h1>DashLogs</h1>
 
-<div class="dashboard-logs-wrapper">
-  <div class="dashboard-logs-header">
-    <button pButton pRipple type="button" icon="pi pi-arrow-left" (click)="goBack()" class="back-button">Tareas</button>
-    <h2>Dashboard de Logs</h2>
+<!-- Mostrar mensaje de límite de tasa -->
+<div *ngIf="rateLimitMessage" class="alert alert-warning">
+  {{ rateLimitMessage }}
+  <button class="close-btn" (click)="clearRateLimitMessage()">×</button>
+</div>
+
+<div class="dashboard">
+  <div class="panel unique-routes">
+    <h3>Rutas Únicas</h3>
+    <div class="big-number">{{ uniqueRoutes }}</div>
   </div>
-
-  <div *ngIf="totalLogs === 0" class="empty-message">
-    <i class="pi pi-info-circle" style="font-size:2rem;color:#888;"></i>
-    <p>No hay logs disponibles para mostrar.</p>
+  <div class="panel sessions">
+    <h3>Registros por Día</h3>
+    <canvas baseChart
+            [datasets]="sessionsChartData.datasets"
+            [labels]="sessionsChartLabels"
+            [options]="sessionsChartOptions"
+            [type]="sessionsChartType"></canvas>
   </div>
-
-  <div *ngIf="totalLogs > 0">
-    <div class="stats-summary-pro">
-      <div class="stat-card-pro">
-        <span class="stat-label">Total de Logs</span>
-        <span class="stat-value">{{ totalLogs }}</span>
-      </div>
-      <div class="stat-card-pro">
-        <span class="stat-label">Promedio Respuesta</span>
-        <span class="stat-value">{{ avgResponseTime | number:'1.4-4' }}s</span>
-      </div>
-      <div class="stat-card-pro">
-        <span class="stat-label">Mínimo Respuesta</span>
-        <span class="stat-value">{{ minResponseTime === 0 && totalLogs > 0 ? '0.0000' : (minResponseTime | number:'1.4-4') }}s</span>
-      </div>
-      <div class="stat-card-pro">
-        <span class="stat-label">Máximo Respuesta</span>
-        <span class="stat-value">{{ maxResponseTime === 0 && totalLogs > 0 ? '0.0000' : (maxResponseTime | number:'1.4-4') }}s</span>
-      </div>
-    </div>
-
-    <div class="charts-grid">
-      <div class="chart-box">
-        <h4>Distribución de Códigos de Estado</h4>
-        <canvas #statusChart></canvas>
-      </div>
-      <div class="chart-box">
-        <h4>Uso de la API</h4>
-        <canvas #apiChart></canvas>
-      </div>
-      <div class="chart-box">
-        <h4>Estadísticas de Tiempo de Respuesta</h4>
-        <canvas #responseTimeChart></canvas>
-      </div>
-      <div class="chart-box">
-        <h4>Logs por Servicio</h4>
-        <canvas #totalLogsChart></canvas>
-      </div>
-    </div>
-
-    <div class="logs-table-section" *ngIf="totalLogs > 0">
-      <h4 style="margin-top:2rem; color:#1976d2;">Detalle de Logs Recientes</h4>
-      <div class="logs-filters" style="margin-bottom:1rem; display:flex; gap:1.5rem; align-items:center; flex-wrap:wrap;">
-        <label>
-          Usuario:
-          <input type="text" [(ngModel)]="logUserFilter" placeholder="Filtrar por usuario" style="padding:0.3rem 0.7rem; border-radius:6px; border:1px solid #ccc;" />
-        </label>
-        <label>
-          Status:
-          <input type="text" [(ngModel)]="logStatusFilter" placeholder="Filtrar por status" style="padding:0.3rem 0.7rem; border-radius:6px; border:1px solid #ccc;" />
-        </label>
-        <label>
-          Tiempo de respuesta (s):
-          <input type="number" [(ngModel)]="logTimeFilter" placeholder="Ej: 0.5" style="padding:0.3rem 0.7rem; border-radius:6px; border:1px solid #ccc; width:90px;" />
-        </label>
-        <label>
-          Fecha:
-          <input type="date" [(ngModel)]="logDateFilter" style="padding:0.3rem 0.7rem; border-radius:6px; border:1px solid #ccc;" />
-        </label>
-        <button pButton pRipple type="button" icon="pi pi-filter-slash" (click)="clearLogFilters()" class="p-button-secondary p-button-sm">Limpiar filtros</button>
-      </div>
-      <div style="overflow-x:auto;">
-        <table class="logs-table">
-          <thead>
-            <tr>
-              <th>Usuario</th>
-              <th>Status</th>
-              <th>Tiempo de Respuesta</th>
-              <th>Timestamp</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let log of logData | logFilter:logUserFilter:logStatusFilter:logTimeFilter:logDateFilter">
-              <td>{{ log.user || '-' }}</td>
-              <td>{{ log.status || '-' }}</td>
-              <td>{{ log.response_time !== undefined ? (log.response_time + 's') : '-' }}</td>
-              <td>{{ log.timestamp || '-' }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+  <div class="panel total-logs">
+    <h3>Total de Registros</h3>
+    <div class="big-number">{{ totalLogs }}</div>
+  </div>
+  <div class="panel method-distribution">
+    <h3>Distribución de Métodos</h3>
+    <canvas baseChart
+            [datasets]="methodChartData.datasets"
+            [labels]="methodChartLabels"
+            [options]="methodChartOptions"
+            [type]="methodChartType"></canvas>
+  </div>
+  <div class="panel status-codes">
+    <h3>Códigos de Estado</h3>
+    <canvas baseChart
+            [datasets]="statusChartData.datasets"
+            [labels]="statusChartLabels"
+            [options]="statusChartOptions"
+            [type]="statusChartType"></canvas>
+  </div>
+  <div class="panel rt-trend">
+    <h3>Tendencia de Tiempo de Respuesta</h3>
+    <canvas baseChart
+            [datasets]="rtChartData.datasets"
+            [labels]="rtChartLabels"
+            [options]="rtChartOptions"
+            [type]="rtChartType"></canvas>
   </div>
 </div>
 
-<style>
-.dashboard-logs-wrapper {
-  max-width: 1200px;
-  margin: 2rem auto;
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.08);
-  padding: 2rem 2.5rem 2.5rem 2.5rem;
-}
-.dashboard-logs-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-}
-.back-button {
-  background: #1976d2;
-  color: #fff;
-  border-radius: 50px;
-  font-weight: 600;
-  margin-right: 1.5rem;
-}
-.stats-summary-pro {
-  display: flex;
-  gap: 2rem;
-  justify-content: space-between;
-  margin-bottom: 2.5rem;
-}
-.stat-card-pro {
-  background: linear-gradient(135deg, #1976d2 60%, #42a5f5 100%);
-  color: #fff;
-  border-radius: 12px;
-  padding: 1.5rem 2.5rem;
-  min-width: 180px;
-  box-shadow: 0 2px 8px 0 rgba(25,118,210,0.08);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.stat-label {
-  font-size: 1.1rem;
-  opacity: 0.85;
-  margin-bottom: 0.5rem;
-}
-.stat-value {
-  font-size: 2.1rem;
-  font-weight: bold;
-}
-.charts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-  gap: 2rem;
-}
-.chart-box {
-  background: #f5f7fa;
-  border-radius: 12px;
-  padding: 1.5rem 1rem 1rem 1rem;
-  box-shadow: 0 1px 4px 0 rgba(25,118,210,0.04);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.chart-box h4 {
-  margin-bottom: 1rem;
-  color: #1976d2;
-  font-weight: 600;
-}
-.empty-message {
-  text-align: center;
-  margin: 3rem 0 2rem 0;
-  color: #888;
-  font-size: 1.2rem;
-}
-.logs-table-section {
-  margin-top: 2rem;
-}
-.logs-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 4px 0 rgba(25,118,210,0.04);
-  font-size: 1rem;
-}
-.logs-table th, .logs-table td {
-  padding: 0.7rem 1.2rem;
-  border-bottom: 1px solid #e0e0e0;
-  text-align: left;
-}
-.logs-table th {
-  background: #1976d2;
-  color: #fff;
-  font-weight: 600;
-}
-.logs-table tr:last-child td {
-  border-bottom: none;
-}
-@media (max-width: 900px) {
-  .stats-summary-pro {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  .dashboard-logs-wrapper {
-    padding: 1rem;
-  }
-}
-</style>
+<div class="additional-stats">
+  <h3>Estadísticas Adicionales de Registros</h3>
+  <div class="stats-grid">
+    <p-card class="stat-card">
+      <div class="stat-content">
+        <i class="pi pi-clock stat-icon"></i>
+        <h4>Tiempo de Respuesta Promedio</h4>
+        <p class="stat-value">{{ avgResponseTime }} segundos</p>
+      </div>
+    </p-card>
+    <p-card class="stat-card">
+      <div class="stat-content">
+        <i class="pi pi-bolt stat-icon"></i>
+        <h4>Tiempo de Respuesta Más Corto</h4>
+        <p class="stat-value">{{ minResponseTime }} segundos</p>
+      </div>
+    </p-card>
+    <p-card class="stat-card">
+      <div class="stat-content">
+        <i class="pi pi-arrow-up stat-icon"></i>
+        <h4>API Más Consumida</h4>
+        <p class="stat-value">{{ mostConsumedAPI.route }} ({{ mostConsumedAPI.count }} llamadas)</p>
+      </div>
+    </p-card>
+    <p-card class="stat-card">
+      <div class="stat-content">
+        <i class="pi pi-arrow-down stat-icon"></i>
+        <h4>API Menos Consumida</h4>
+        <p class="stat-value">{{ leastConsumedAPI.route }} ({{ leastConsumedAPI.count }} llamadas)</p>
+      </div>
+    </p-card>
+    <p-card class="stat-card status-codes">
+      <div class="stat-content">
+        <i class="pi pi-list stat-icon"></i>
+        <h4>Conteo de Códigos de Estado</h4>
+        <ul class="status-list">
+          <li *ngFor="let status of statusChartLabels" [ngClass]="{'status-success': status === '200', 'status-error': status === '401' || status === '404' || status === '500'}">
+            Estado {{ status }}: {{ statusCounts[status] }} ocurrencias
+          </li>
+        </ul>
+      </div>
+    </p-card>
+  </div>
+</div>
