@@ -1,10 +1,8 @@
-<div *ngIf="tasks.length === 0" class="empty-message" style="text-align:center; margin:2rem; color:#888;">
-  No tienes tareas registradas. ¡Crea una nueva para comenzar!
-</div>
 <app-header [headerTitle]="'Tareas'"></app-header>
 
 <p-confirmDialog></p-confirmDialog>
 
+<!-- Mostrar mensaje de límite de tasa -->
 <div *ngIf="rateLimitMessage" class="alert alert-warning">
   {{ rateLimitMessage }}
   <button class="close-btn" (click)="clearRateLimitMessage()">×</button>
@@ -15,9 +13,7 @@
     label="Crear Nueva Tarea"
     icon="pi pi-plus"
     [raised]="true"
-    severity="primary"
     (click)="navigateToCreate()"
-    class="create-task-btn"
   ></p-button>
 </div>
 
@@ -33,20 +29,14 @@
     (cdkDropListDropped)="drop($event)"
     [cdkDropListConnectedTo]="columnIds"
   >
-    <ng-template pTemplate="header">
-      <div class="column-header">
-        <h3>{{ column.header }}</h3>
-        <span class="task-count">{{ column.tasks.length }} {{ column.tasks.length === 1 ? 'tarea' : 'tareas' }}</span>
-      </div>
-    </ng-template>
-    <div *ngFor="let task of column.tasks" cdkDrag class="kanban-card-wrapper">
+    <div *ngFor="let task of column.tasks" cdkDrag>
       <p-card class="kanban-card" [ngStyle]="{'background-color': getCardColor(task.status)}">
         <h4 class="task-title">{{ task.name }}</h4>
         <div class="task-content">
           <p class="task-description">{{ task.description }}</p>
-          <small class="task-deadline">Creación: {{ task.created_at | date:'shortDate' }}</small>
+          <small class="task-deadline">Creación: {{ task.created_at }}</small>
           <br />
-          <small class="task-deadline">Fecha límite: {{ task.dead_line | date:'shortDate' }}</small>
+          <small class="task-deadline">Fecha límite: {{ task.dead_line }}</small>
         </div>
         <div class="task-actions">
           <p-button
@@ -54,16 +44,12 @@
             [rounded]="true"
             severity="secondary"
             (click)="navigateToEdit(task.id!)"
-            pTooltip="Editar tarea"
-            tooltipPosition="top"
           ></p-button>
           <p-button
             icon="pi pi-trash"
             [rounded]="true"
             severity="danger"
             (click)="confirmDelete(task.id)"
-            pTooltip="Eliminar tarea"
-            tooltipPosition="top"
           ></p-button>
         </div>
       </p-card>
